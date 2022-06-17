@@ -1,0 +1,7 @@
+Program Example1; (* Example 1 *)
+Function F(n : Integer; var c: char; d:) : Integer;
+  Begin
+    If n = 0 Then F := 1 Else F := N * F (N - 1);
+  End;
+Begin
+End. (* Example 1 *)
