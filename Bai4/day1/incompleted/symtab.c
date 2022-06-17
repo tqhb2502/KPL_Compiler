@@ -41,29 +41,78 @@ Type* makeArrayType(int arraySize, Type* elementType) {
 }
 
 Type* duplicateType(Type* type) {
-  // TODO
+
+  Type *resultType = (Type *) malloc(sizeof(Type));
+
+  resultType->typeClass = type->typeClass;
+  if (type->typeClass == TP_ARRAY) {
+    resultType->arraySize = type->arraySize;
+    resultType->elementType = duplicateType(type->elementType);
+  }
+
+  return resultType;
 }
 
 int compareType(Type* type1, Type* type2) {
-  // TODO
+
+  if (type1->typeClass == type2->typeClass) {
+
+    if (type1->typeClass == TP_ARRAY) {
+
+      if (type1->arraySize == type2->arraySize) {
+        return compareType(type1->elementType, type2->elementType);
+      } else return 0;
+    } else return 1;
+  } else return 0;
 }
 
 void freeType(Type* type) {
-  // TODO
+
+  switch (type->typeClass) {
+  case TP_INT:
+  case TP_CHAR:
+    free(type);
+    break;
+  case TP_ARRAY:
+    freeType(type->elementType);
+    free(type);
+  }
 }
 
 /******************* Constant utility ******************************/
 
 ConstantValue* makeIntConstant(int i) {
-  // TODO
+
+  ConstantValue *value = (ConstantValue *) malloc(sizeof(ConstantValue));
+
+  value->type = TP_INT;
+  value->intValue = i;
+
+  return value;
 }
 
 ConstantValue* makeCharConstant(char ch) {
-  // TODO
+  
+  ConstantValue *value = (ConstantValue *) malloc(sizeof(ConstantValue));
+
+  value->type = TP_CHAR;
+  value->charValue = ch;
+
+  return value;
 }
 
 ConstantValue* duplicateConstantValue(ConstantValue* v) {
-  // TODO
+  
+  ConstantValue *result = (ConstantValue *) malloc(sizeof(ConstantValue));
+
+  result->type = v->type;
+  if (v->type == TP_INT) {
+    result->intValue = v->intValue;
+  } else {
+    result->charValue = v->charValue;
+  }
+
+  return result;
 }
 
 /******************* Object utilities ******************************/
