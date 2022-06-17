@@ -137,15 +137,37 @@ Object* createProgramObject(char *programName) {
 }
 
 Object* createConstantObject(char *name) {
-  // TODO
+  
+  Object *object = (Object *) malloc(sizeof(Object));
+
+  strcpy(object->name, name);
+  object->kind = OBJ_CONSTANT;
+  object->constAttrs = (ConstantAttributes *) malloc(sizeof(ConstantAttributes));
+  
+  return object;
 }
 
 Object* createTypeObject(char *name) {
-  // TODO
+  
+  Object *object = (Object *) malloc(sizeof(Object));
+
+  strcpy(object->name, name);
+  object->kind = OBJ_TYPE;
+  object->typeAttrs = (TypeAttributes *) malloc(sizeof(TypeAttributes));
+
+  return object;
 }
 
 Object* createVariableObject(char *name) {
-  // TODO
+  
+  Object *object = (Object *) malloc(sizeof(Object));
+
+  strcpy(object->name, name);
+  object->kind = OBJ_VARIABLE;
+  object->varAttrs = (VariableAttributes *) malloc(sizeof(VariableAttributes));
+  object->varAttrs->scope = symtab->currentScope;
+
+  return object;
 }
 
 Object* createFunctionObject(char *name) {
