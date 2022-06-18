@@ -171,19 +171,71 @@ Object* createVariableObject(char *name) {
 }
 
 Object* createFunctionObject(char *name) {
-  // TODO
+  
+  Object *object = (Object *) malloc(sizeof(Object));
+
+  strcpy(object->name, name);
+  object->kind = OBJ_FUNCTION;
+  object->funcAttrs = (FunctionAttributes *) malloc(sizeof(FunctionAttributes));
+  object->funcAttrs->paramList = NULL;
+  object->funcAttrs->scope = createScope(object, symtab->currentScope);
+
+  return object;
 }
 
 Object* createProcedureObject(char *name) {
-  // TODO
+  
+  Object *object = (Object *) malloc(sizeof(Object));
+
+  strcpy(object->name, name);
+  object->kind = OBJ_PROCEDURE;
+  object->procAttrs = (ProcedureAttributes *) malloc(sizeof(ProcedureAttributes));
+  object->procAttrs->paramList = NULL;
+  object->procAttrs->scope = createScope(object, symtab->currentScope);
+
+  return object;
 }
 
 Object* createParameterObject(char *name, enum ParamKind kind, Object* owner) {
-  // TODO
+  
+  Object *object = (Object *) malloc(sizeof(Object));
+
+  strcpy(object->name, name);
+  object->kind = OBJ_PARAMETER;
+  object->paramAttrs = (ParameterAttributes *) malloc(sizeof(ParameterAttributes));
+  object->paramAttrs->kind = kind;
+  object->paramAttrs->function = owner;
+
+  return object;
 }
 
 void freeObject(Object* obj) {
-  // TODO
+  
+  free(obj->name);
+
+  switch (obj->kind) {
+  case OBJ_PROGRAM:
+    break;
+  case OBJ_CONSTANT:
+    free(obj->constAttrs->value);
+    free(obj->constAttrs);
+    break;
+  case OBJ_TYPE:
+    free(obj->typeAttrs->actualType);
+    free(obj->typeAttrs);
+    break;
+  case OBJ_VARIABLE:
+    free(obj->varAttrs->type);
+    free(obj->varAttrs);
+    break;
+  case OBJ_FUNCTION:
+    break;
+  case OBJ_PROCEDURE:
+    break;
+  case OBJ_PARAMETER:
+  }
+
+  free(obj);
 }
 
 void freeScope(Scope* scope) {
