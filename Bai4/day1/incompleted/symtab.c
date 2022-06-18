@@ -210,11 +210,11 @@ Object* createParameterObject(char *name, enum ParamKind kind, Object* owner) {
 }
 
 void freeObject(Object* obj) {
-  
-  free(obj->name);
 
   switch (obj->kind) {
   case OBJ_PROGRAM:
+    freeScope(obj->progAttrs->scope);
+    free(obj->progAttrs);
     break;
   case OBJ_CONSTANT:
     free(obj->constAttrs->value);
@@ -229,25 +229,51 @@ void freeObject(Object* obj) {
     free(obj->varAttrs);
     break;
   case OBJ_FUNCTION:
+    freeReferenceList(obj->funcAttrs->paramList);
+    freeType(obj->funcAttrs->returnType);
+    freeScope(obj->funcAttrs->scope);
+    free(obj->funcAttrs);
     break;
   case OBJ_PROCEDURE:
+    freeReferenceList(obj->procAttrs->paramList);
+    freeScope(obj->procAttrs->scope);
+    free(obj->procAttrs);
     break;
   case OBJ_PARAMETER:
+    freeType(obj->paramAttrs->type);
+    free(obj->paramAttrs);
   }
 
   free(obj);
 }
 
 void freeScope(Scope* scope) {
-  // TODO
+  
+  freeObjectList(scope->objList);
+  free(scope);
 }
 
 void freeObjectList(ObjectNode *objList) {
-  // TODO
+
+  ObjectNode *node;
+
+  while (objList != NULL) {
+    node = objList;
+    objList = objList->next;
+    freeObject(node->object);
+    free(node);
+  }
 }
 
 void freeReferenceList(ObjectNode *objList) {
-  // TODO
+
+  ObjectNode *node;
+
+  while (objList != NULL) {
+    node = objList;
+    objList = objList->next;
+    free(node);
+  }
 }
 
 void addObject(ObjectNode **objList, Object* obj) {
@@ -265,7 +291,19 @@ void addObject(ObjectNode **objList, Object* obj) {
 }
 
 Object* findObject(ObjectNode *objList, char *name) {
-  // TODO
+
+  ObjectNode *node;
+  
+  while (objList != NULL) {
+    node = objList;
+
+    if (strcmp(node->object->name, name) == 0)
+      return node->object;
+    else
+      objList = objList->next;
+  }
+
+  return NULL;
 }
 
 /******************* others ******************************/
