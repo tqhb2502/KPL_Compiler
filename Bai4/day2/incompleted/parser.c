@@ -34,6 +34,7 @@ void eat(TokenType tokenType) {
 
 void compileProgram(void) {
   // TODO: create, enter, and exit program block
+  // DONE
   Object *program;
 
   eat(KW_PROGRAM);
@@ -51,6 +52,7 @@ void compileProgram(void) {
 
 void compileBlock(void) {
   // TODO: create and declare constant objects
+  // DONE
   Object *constant;
 
   if (lookAhead->tokenType == KW_CONST) {
@@ -76,6 +78,7 @@ void compileBlock(void) {
 
 void compileBlock2(void) {
   // TODO: create and declare type objects
+  // DONE
   Object *type;
 
   if (lookAhead->tokenType == KW_TYPE) {
@@ -101,6 +104,7 @@ void compileBlock2(void) {
 
 void compileBlock3(void) {
   // TODO: create and declare variable objects
+  // DONE
   Object *variable;
 
   if (lookAhead->tokenType == KW_VAR) {
@@ -146,6 +150,7 @@ void compileSubDecls(void) {
 
 void compileFuncDecl(void) {
   // TODO: create and declare a function object
+  // DONE
   Object *function;
 
   eat(KW_FUNCTION);
@@ -169,6 +174,7 @@ void compileFuncDecl(void) {
 
 void compileProcDecl(void) {
   // TODO: create and declare a procedure object
+  // DONE
   Object *procedure;
 
   eat(KW_PROCEDURE);
@@ -188,6 +194,7 @@ void compileProcDecl(void) {
 
 ConstantValue* compileUnsignedConstant(void) {
   // TODO: create and return an unsigned constant value
+  // DONE
   ConstantValue* constValue;
   Object *obj;
 
@@ -218,6 +225,7 @@ ConstantValue* compileUnsignedConstant(void) {
 
 ConstantValue* compileConstant(void) {
   // TODO: create and return a constant
+  // DONE
   ConstantValue* constValue;
 
   switch (lookAhead->tokenType) {
@@ -253,14 +261,15 @@ ConstantValue* compileConstant2(void) {
     break;
   case TK_IDENT:
     eat(TK_IDENT);
+    obj = lookupObject(currentToken->name);
     if (obj != NULL) {
 
       if (obj->kind == OBJ_CONSTANT) {
 
         if (obj->constAttrs->value->type != TP_INT) {
-
-        }
-      }
+          
+        } else error(ERR_UNDECLARED_INT_CONSTANT, currentToken->lineNo, currentToken->colNo);
+      } else error(ERR_UNDECLARED_CONSTANT, currentToken->lineNo, currentToken->colNo);
     } else error(ERR_UNDECLARED_CONSTANT, currentToken->lineNo, currentToken->colNo);
     break;
   default:
