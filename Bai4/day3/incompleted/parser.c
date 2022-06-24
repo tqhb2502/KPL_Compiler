@@ -60,6 +60,8 @@ void compileBlock(void) {
     do {
       eat(TK_IDENT);
       // TODO: Check if a constant identifier is fresh in the block
+      // DONE
+      checkFreshIdent(currentToken->string);
 
       // Create a constant object
       constObj = createConstantObject(currentToken->string);
@@ -89,6 +91,8 @@ void compileBlock2(void) {
     do {
       eat(TK_IDENT);
       // TODO: Check if a type identifier is fresh in the block
+      // DONE
+      checkFreshIdent(currentToken->string);
 
       // create a type object
       typeObj = createTypeObject(currentToken->string);
@@ -118,6 +122,8 @@ void compileBlock3(void) {
     do {
       eat(TK_IDENT);
       // TODO: Check if a variable identifier is fresh in the block
+      // DONE
+      checkFreshIdent(currentToken->string);
 
       // Create a variable object      
       varObj = createVariableObject(currentToken->string);
@@ -163,6 +169,8 @@ void compileFuncDecl(void) {
   eat(KW_FUNCTION);
   eat(TK_IDENT);
   // TODO: Check if a function identifier is fresh in the block
+  // DONE
+  checkFreshIdent(currentToken->string);
 
   // create the function object
   funcObj = createFunctionObject(currentToken->string);
@@ -190,6 +198,7 @@ void compileProcDecl(void) {
   eat(KW_PROCEDURE);
   eat(TK_IDENT);
   // TODO: Check if a procedure identifier is fresh in the block
+  // DONE
   checkFreshIdent(currentToken->string);
   // create a procedure object
   procObj = createProcedureObject(currentToken->string);
@@ -219,7 +228,9 @@ ConstantValue* compileUnsignedConstant(void) {
   case TK_IDENT:
     eat(TK_IDENT);
     // TODO: check if the constant identifier is declared and get its value
-
+    // DONE
+    obj = checkDeclaredConstant(currentToken->string);
+    constValue = duplicateConstantValue(obj->constAttrs->value);
     break;
   case TK_CHAR:
     eat(TK_CHAR);
@@ -268,6 +279,12 @@ ConstantValue* compileConstant2(void) {
   case TK_IDENT:
     eat(TK_IDENT);
     // TODO: check if the integer constant identifier is declared and get its value
+    // DONE
+    obj = checkDeclaredConstant(currentToken->string);
+    if (obj->constAttrs->value->type == TP_INT)
+      constValue = duplicateConstantValue(obj->constAttrs->value);
+    else
+      error(ERR_UNDECLARED_INT_CONSTANT, currentToken->lineNo, currentToken->colNo);
     break;
   default:
     error(ERR_INVALID_CONSTANT, lookAhead->lineNo, lookAhead->colNo);
@@ -306,6 +323,9 @@ Type* compileType(void) {
   case TK_IDENT:
     eat(TK_IDENT);
     // TODO: check if the type idntifier is declared and get its actual type
+    // DONE
+    obj = checkDeclaredType(currentToken->string);
+    type = duplicateType(obj->typeAttrs->actualType);
     break;
   default:
     error(ERR_INVALID_TYPE, lookAhead->lineNo, lookAhead->colNo);
@@ -365,6 +385,8 @@ void compileParam(void) {
 
   eat(TK_IDENT);
   // TODO: check if the parameter identifier is fresh in the block
+  // DONE
+  checkFreshIdent(currentToken->string);
   param = createParameterObject(currentToken->string, paramKind, symtab->currentScope->owner);
   eat(SB_COLON);
   type = compileBasicType();
@@ -432,6 +454,8 @@ void compileCallSt(void) {
   eat(KW_CALL);
   eat(TK_IDENT);
   // TODO: check if the identifier is a declared procedure
+  // DONE
+  checkDeclaredProcedure(currentToken->string);
   compileArguments();
 }
 
@@ -467,6 +491,8 @@ void compileForSt(void) {
   eat(TK_IDENT);
 
   // TODO: check if the identifier is a variable
+  // DONE
+  checkDeclaredVariable(currentToken->string);
 
   eat(SB_ASSIGN);
   compileExpression();

@@ -324,6 +324,8 @@ Object* lookupObject(char *name) {
     scope = scope->outer;
   }
 
+  result = findObject(symtab->globalObjectList, name);
+  if (result != NULL) return result;
   return NULL;
 }
 

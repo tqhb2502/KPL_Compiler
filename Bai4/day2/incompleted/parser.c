@@ -207,11 +207,6 @@ ConstantValue* compileUnsignedConstant(void) {
     eat(TK_IDENT);
     obj = lookupObject(currentToken->string);
     constValue = duplicateConstantValue(obj->constAttrs->value);
-    // if (obj != NULL) {
-    //   if (obj->kind == OBJ_CONSTANT) {
-    //     constValue = duplicateConstantValue(obj->constAttrs->value);
-    //   } else error(ERR_UNDECLARED_CONSTANT, currentToken->lineNo, currentToken->colNo);
-    // } else error(ERR_UNDECLARED_CONSTANT, currentToken->lineNo, currentToken->colNo);
     break;
   case TK_CHAR:
     eat(TK_CHAR);
@@ -265,15 +260,6 @@ ConstantValue* compileConstant2(void) {
     eat(TK_IDENT);
     obj = lookupObject(currentToken->string);
     constValue = duplicateConstantValue(obj->constAttrs->value);
-    // if (obj != NULL) {
-
-    //   if (obj->kind == OBJ_CONSTANT) {
-
-    //     if (obj->constAttrs->value->type != TP_INT) {
-    //       constValue = duplicateConstantValue(obj->constAttrs->value);
-    //     } else error(ERR_UNDECLARED_INT_CONSTANT, currentToken->lineNo, currentToken->colNo);
-    //   } else error(ERR_UNDECLARED_CONSTANT, currentToken->lineNo, currentToken->colNo);
-    // } else error(ERR_UNDECLARED_CONSTANT, currentToken->lineNo, currentToken->colNo);
     break;
   default:
     error(ERR_INVALID_CONSTANT, lookAhead->lineNo, lookAhead->colNo);
@@ -313,13 +299,6 @@ Type* compileType(void) {
     eat(TK_IDENT);
     obj = lookupObject(currentToken->string);
     type = duplicateType(obj->typeAttrs->actualType);
-    // if (obj != NULL) {
-
-    //   if (obj->kind != OBJ_TYPE) {
-
-    //     type = duplicateType(obj->typeAttrs->actualType);
-    //   } else error(ERR_UNDECLARED_TYPE, currentToken->lineNo, currentToken->colNo);
-    // } else error(ERR_UNDECLARED_TYPE, currentToken->lineNo, currentToken->colNo);
     break;
   default:
     error(ERR_INVALID_TYPE, lookAhead->lineNo, lookAhead->colNo);
