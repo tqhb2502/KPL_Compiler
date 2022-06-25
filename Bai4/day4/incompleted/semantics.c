@@ -111,23 +111,26 @@ Object* checkDeclaredLValueIdent(char* name) {
 
 
 void checkIntType(Type* type) {
-  // TODO
+  if (type->typeClass != TP_INT)
+    error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
 
 void checkCharType(Type* type) {
-  // TODO
+  if (type->typeClass != TP_CHAR)
+    error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
 
 void checkBasicType(Type* type) {
-  // TODO
+  if (type->typeClass != TP_INT && type->typeClass != TP_CHAR)
+    error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
 
 void checkArrayType(Type* type) {
-  // TODO
+  if (type->typeClass != TP_ARRAY)
+    error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
 
 void checkTypeEquality(Type* type1, Type* type2) {
-  // TODO
+  if (!compareType(type1, type2))
+    error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
-
-
