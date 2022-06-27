@@ -153,6 +153,7 @@ Object* createFunctionObject(char *name) {
   obj->funcAttrs = (FunctionAttributes*) malloc(sizeof(FunctionAttributes));
   obj->funcAttrs->paramList = NULL;
   obj->funcAttrs->scope = createScope(obj, symtab->currentScope);
+  obj->funcAttrs->hasReturnValue = 0;
   return obj;
 }
 
