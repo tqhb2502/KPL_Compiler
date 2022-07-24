@@ -76,6 +76,7 @@ struct FunctionAttributes_ {
   struct ObjectNode_ *paramList;
   Type* returnType;
   struct Scope_ *scope;
+  int hasReturnValue;
 };
 
 struct ProgramAttributes_ {

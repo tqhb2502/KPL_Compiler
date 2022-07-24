@@ -15,6 +15,7 @@
 
 Token *currentToken;
 Token *lookAhead;
+Object *currentObject;
 
 extern Type* intType;
 extern Type* charType;
@@ -151,6 +152,8 @@ void compileSubDecls(void) {
 }
 
 void compileFuncDecl(void) {
+  int ln, cn;
+
   Object* funcObj;
   Type* returnType;
 
@@ -158,6 +161,8 @@ void compileFuncDecl(void) {
   eat(TK_IDENT);
 
   checkFreshIdent(currentToken->string);
+  ln = currentToken->lineNo;
+  cn = currentToken->colNo;
   funcObj = createFunctionObject(currentToken->string);
   declareObject(funcObj);
 
@@ -173,6 +178,8 @@ void compileFuncDecl(void) {
   compileBlock();
   eat(SB_SEMICOLON);
 
+  if (funcObj->funcAttrs->hasReturnValue == 0)
+    error(ERR_NORETURN_VALUE_FUNCTION, ln, cn);
   exitBlock();
 }
 
@@ -289,12 +296,12 @@ Type* compileType(void) {
     break;
   case KW_ARRAY:
     eat(KW_ARRAY);
-    eat(SB_LSEL);
+    eat(SB_LBRACKET);
     eat(TK_NUMBER);
 
     arraySize = currentToken->value;
 
-    eat(SB_RSEL);
+    eat(SB_RBRACKET);
     eat(KW_OF);
     elementType = compileType();
     type = makeArrayType(arraySize, elementType);
@@ -430,6 +437,8 @@ Type* compileLValue(void) {
     varType = var->funcAttrs->returnType;
   }
 
+  currentObject = var;
+
   return varType;
 }
 
@@ -439,10 +448,44 @@ void compileAssignSt(void) {
   Type *type1, *type2;
 
   type1 = compileLValue();
-  eat(SB_ASSIGN);
-  type2 = compileExpression();
 
+  if (currentObject->kind == OBJ_FUNCTION) {
+    checkBasicType(currentObject->funcAttrs->returnType);
+    eat(SB_ASSIGN);
+  } else {
+    if (type1->typeClass == TP_INT) {
+      switch (lookAhead->tokenType) {
+      case SB_ASSIGN:
+        eat(SB_ASSIGN);
+        break;
+      case SB_ASSIGN_PLUS:
+        eat(SB_ASSIGN_PLUS);
+        break;
+      case SB_ASSIGN_SUBTRACT:
+        eat(SB_ASSIGN_SUBTRACT);
+        break;
+      case SB_ASSIGN_TIMES:
+        eat(SB_ASSIGN_TIMES);
+        break;
+      case SB_ASSIGN_DIVIDE:
+        eat(SB_ASSIGN_DIVIDE);
+        break;
+      default:
+        error(ERR_INVALID_STATEMENT, currentToken->lineNo, currentToken->colNo);
+      }
+    }
+    
+    if (type1->typeClass == TP_CHAR) {
+      eat(SB_ASSIGN);
+    }
+  }
+
+  type2 = compileExpression();
   checkTypeEquality(type1, type2);
+
+  if (currentObject->kind == OBJ_FUNCTION) {
+    currentObject->funcAttrs->hasReturnValue = 1;
+  }
 }
 
 void compileCallSt(void) {
@@ -496,7 +539,32 @@ void compileForSt(void) {
   var = checkDeclaredVariable(currentToken->string);
   checkBasicType(var->varAttrs->type);
 
-  eat(SB_ASSIGN);
+  if (var->varAttrs->type->typeClass == TP_INT) {
+    switch (lookAhead->tokenType) {
+    case SB_ASSIGN:
+      eat(SB_ASSIGN);
+      break;
+    case SB_ASSIGN_PLUS:
+      eat(SB_ASSIGN_PLUS);
+      break;
+    case SB_ASSIGN_SUBTRACT:
+      eat(SB_ASSIGN_SUBTRACT);
+      break;
+    case SB_ASSIGN_TIMES:
+      eat(SB_ASSIGN_TIMES);
+      break;
+    case SB_ASSIGN_DIVIDE:
+      eat(SB_ASSIGN_DIVIDE);
+      break;
+    default:
+      error(ERR_INVALID_STATEMENT, currentToken->lineNo, currentToken->colNo);
+    }
+  }
+  
+  if (var->varAttrs->type->typeClass == TP_CHAR) {
+    eat(SB_ASSIGN);
+  }
+
   exp1Type = compileExpression();
   checkBasicType(exp1Type);
 
@@ -566,7 +634,7 @@ void compileArguments(ObjectNode* paramList) {
   case SB_LT:
   case SB_GE:
   case SB_GT:
-  case SB_RSEL:
+  case SB_RBRACKET:
   case SB_SEMICOLON:
   case KW_END:
   case KW_ELSE:
@@ -682,7 +750,7 @@ Type* compileExpression3(void) {
   case SB_LT:
   case SB_GE:
   case SB_GT:
-  case SB_RSEL:
+  case SB_RBRACKET:
   case SB_SEMICOLON:
   case KW_END:
   case KW_ELSE:
@@ -738,7 +806,7 @@ void compileTerm2(void) {
   case SB_LT:
   case SB_GE:
   case SB_GT:
-  case SB_RSEL:
+  case SB_RBRACKET:
   case SB_SEMICOLON:
   case KW_END:
   case KW_ELSE:
@@ -805,15 +873,15 @@ Type* compileIndexes(Type* arrayType) {
   // DONE
   Type *idxType, *elmType;
 
-  while (lookAhead->tokenType == SB_LSEL) {
-    eat(SB_LSEL);
+  while (lookAhead->tokenType == SB_LBRACKET) {
+    eat(SB_LBRACKET);
 
     checkArrayType(arrayType);
 
     idxType = compileExpression();
     checkIntType(idxType);
 
-    eat(SB_RSEL);
+    eat(SB_RBRACKET);
 
     arrayType = arrayType->elementType;
   }
