@@ -1,0 +1,7 @@
+program tinhtong;
+var v1: integer;
+	v2: integer;
+	v3: integer;
+begin
+	v1 := sum v1, sum v1, v2;
+end.

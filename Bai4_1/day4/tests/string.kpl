@@ -1,0 +1,8 @@
+program aaa;
+const h = "tqhuy";
+var a: char;
+s: string;
+begin
+s := "a";
+a := "abc";
+end.
